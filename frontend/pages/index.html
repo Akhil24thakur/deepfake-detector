@@ -284,7 +284,30 @@
         }
 
         localStorage.setItem('deepfake_result', JSON.stringify(data));
-        window.location.href = 'result.html';
+
+        try {
+          const canvas = document.createElement('canvas');
+          const url = URL.createObjectURL(selectedFile);
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            const max = 200;
+            if (w > max || h > max) {
+              if (w > h) { h = Math.round(h * max / w); w = max; }
+              else { w = Math.round(w * max / h); h = max; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            try { localStorage.setItem('deepfake_image', canvas.toDataURL('image/jpeg', 0.5)); } catch(e) {}
+            URL.revokeObjectURL(url);
+            window.location.href = 'result.html';
+          };
+          img.onerror = () => { window.location.href = 'result.html'; };
+          img.src = url;
+        } catch(e) {
+          window.location.href = 'result.html';
+        }
 
       } catch (err) {
         btn.textContent = 'Analyze Image Now';
