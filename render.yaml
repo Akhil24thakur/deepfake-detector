@@ -7,8 +7,8 @@ services:
     startCommand: cd backend && gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.9
+        value: "3.12.7"
       - key: FLASK_DEBUG
-        value: false
+        value: "false"
       - key: SECRET_KEY
         generateValue: true
