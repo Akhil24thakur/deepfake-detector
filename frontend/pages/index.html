@@ -289,7 +289,32 @@
         localStorage.setItem('deepfake_result', JSON.stringify(data));
         const reader = new FileReader();
         reader.onload = e => {
-          localStorage.setItem('deepfake_image', e.target.result);
+          try {
+            localStorage.setItem('deepfake_image', e.target.result);
+          } catch (storageErr) {
+            console.warn('Image too large for localStorage, compressing...');
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const maxDim = 400;
+              let w = img.width, h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else { w = Math.round(w * maxDim / h); h = maxDim; }
+              }
+              canvas.width = w;
+              canvas.height = h;
+              canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+              try {
+                localStorage.setItem('deepfake_image', canvas.toDataURL('image/jpeg', 0.6));
+              } catch (e2) {
+                console.warn('Could not store image, proceeding without preview');
+              }
+              window.location.href = 'result.html';
+            };
+            img.src = e.target.result;
+            return;
+          }
           window.location.href = 'result.html';
         };
         reader.readAsDataURL(selectedFile);
