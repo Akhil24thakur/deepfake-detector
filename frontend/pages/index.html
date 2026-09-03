@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DeepFake Detection System</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/hamburger.css" />
+  <link rel="stylesheet" href="../css/mobile.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">DeepFake <strong>Detector</strong> <span>👁️</span></div>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="history.html">History</a></li>
+      </ul>
+      <div class="desktop-auth-btns" id="desktopAuthBtns">
+        <a href="signin.html" class="desk-signin">Sign In</a>
+        <a href="signup.html" class="desk-signup">Sign Up</a>
+      </div>
+      <button class="theme-toggle" id="desktopThemeBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <div class="desktop-profile-wrap">
+        <button class="desktop-profile-btn" id="desktopProfileBtn" onclick="toggleDesktopDropdown()">
+          <div class="desktop-profile-avatar" id="desktopAvatarText">MK</div>
+          <span class="desktop-profile-name" id="desktopProfileName">Manish</span>
+          <span style="font-size:10px;color:#e94560;">▾</span>
+        </button>
+        <div class="desktop-profile-dropdown" id="desktopDropdown">
+          <div class="dropdown-user-header">
+            <div class="dropdown-user-name" id="dropdownName">Manish Kumar</div>
+            <div class="dropdown-user-email" id="dropdownEmail">manish@gmail.com</div>
+            <div class="dropdown-user-plan">✅ Free Plan · <span id="dropdownScans">3/4</span> scans today</div>
+          </div>
+          <a href="history.html" class="dropdown-item">📋 &nbsp; My History</a>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="signOut()">🚪 &nbsp; Sign Out</div>
+        </div>
+      </div>
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Open menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+  <aside class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <div class="menu-logo">👁️ DeepFake <strong>Detector</strong></div>
+      <button class="menu-close" onclick="closeMenu()">✕</button>
+    </div>
+    <div class="menu-profile">
+      <div class="menu-profile-guest" id="menuGuestSection">
+        <div class="menu-guest-text">
+          <strong>👋 Welcome!</strong>
+          Sign in to save your scan history
+        </div>
+        <div class="menu-auth-btns">
+          <a href="signin.html" class="menu-btn-signin" onclick="closeMenu()">🔑 Sign In</a>
+          <a href="signup.html" class="menu-btn-signup" onclick="closeMenu()">✨ Sign Up</a>
+        </div>
+      </div>
+      <div class="menu-profile-user" id="menuUserSection">
+        <div class="menu-avatar" id="menuAvatarText">MK</div>
+        <div class="menu-user-info">
+          <span class="menu-user-name" id="menuUserName">Manish Kumar</span>
+          <span class="menu-user-email" id="menuUserEmail">manish@gmail.com</span>
+          <span class="menu-scan-badge" id="menuScanBadge">⚡ 3/4 scans today</span>
+        </div>
+      </div>
+    </div>
+    <nav class="menu-nav">
+      <div class="menu-section-label">Navigation</div>
+      <a href="index.html" class="menu-nav-item active" onclick="closeMenu()">
+        <span class="menu-nav-icon">🏠</span><span class="menu-nav-text">Home</span>
+      </a>
+      <a href="history.html" class="menu-nav-item" onclick="closeMenu()" id="menuHistoryLink">
+        <span class="menu-nav-icon">📋</span><span class="menu-nav-text">History</span>
+        <span class="menu-nav-badge" id="menuHistoryBadge" style="display:none;">3</span>
+      </a>
+      <div class="menu-divider"></div>
+      <div class="menu-section-label">Account</div>
+      <a href="signin.html" class="menu-nav-item" id="menuSignInLink" onclick="closeMenu()">
+        <span class="menu-nav-icon">🔑</span><span class="menu-nav-text">Sign In</span>
+      </a>
+      <a href="signup.html" class="menu-nav-item" id="menuSignUpLink" onclick="closeMenu()">
+        <span class="menu-nav-icon">✨</span><span class="menu-nav-text">Sign Up</span>
+      </a>
+      <button class="menu-nav-item signout" id="menuSignOutBtn" style="display:none;" onclick="signOut()">
+        <span class="menu-nav-icon">🚪</span><span class="menu-nav-text">Sign Out</span>
+      </button>
+    </nav>
+    <div class="menu-footer">
+      <div class="theme-row">
+        <div class="theme-row-label">
+          <div class="theme-row-icon" id="themeRowIcon">🌙</div>
+          <span id="themeRowText">Dark Mode</span>
+        </div>
+        <label class="theme-switch">
+          <input type="checkbox" id="themeSwitchInput" onchange="toggleThemeSwitch(this)">
+          <span class="theme-slider"></span>
+        </label>
+      </div>
+    </div>
+  </aside>
+
+  <header class="hero">
+    <div class="hero-text">
+      <h1>DeepFake Detection</h1>
+      <p class="hero-sub">Upload any image and our AI will tell you if it is real or AI-generated.</p>
+      <div class="badges">
+        <span class="badge">✅ Guaranteed Result</span>
+        <span class="badge">🔒 Secure Upload</span>
+        <span class="badge">⚡ Fast Analysis</span>
+      </div>
+    </div>
+    <div class="scanner-wrap">
+      <div class="scanner-container">
+        <div class="ring ring-1"></div><div class="ring ring-2"></div><div class="ring ring-3"></div>
+        <div class="eye-outer"><div class="eye-inner"><div class="iris"><div class="pupil"></div></div></div></div>
+        <div class="scan-line"></div>
+        <div class="bracket top-left"></div><div class="bracket top-right"></div>
+        <div class="bracket bottom-left"></div><div class="bracket bottom-right"></div>
+        <div class="radar-sweep"></div>
+        <div class="orbit-dot dot-top"></div><div class="orbit-dot dot-right"></div>
+        <div class="orbit-dot dot-bottom"></div><div class="orbit-dot dot-left"></div>
+        <div class="scanner-label">AI SCANNER</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="upload-section">
+      <h2>Upload Image for Analysis</h2>
+      <p class="section-sub">Supports JPG, PNG, WEBP — Max size 10MB</p>
+      <div class="drop-zone" id="dropZone">
+        <div id="previewContainer" style="display:none;flex-direction:column;align-items:center;gap:12px;padding:16px;width:100%;">
+          <img id="imagePreview" src="" alt="Preview" style="max-width:100%;max-height:260px;border-radius:10px;object-fit:contain;border:2px solid rgba(233,69,96,0.4);" />
+          <button onclick="removeImage()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#ef4444;padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;">✕ Remove</button>
+          <div id="previewInfo" style="font-size:12px;color:#64748b;font-family:monospace;"></div>
+        </div>
+        <div id="uploadUI">
+          <div class="drop-icon">🖼️</div>
+          <p class="drop-title">Drag &amp; Drop your image here</p>
+          <p class="drop-sub">or</p>
+          <label class="btn-upload" for="imageUpload">Choose Image</label>
+          <p class="file-formats">JPG &bull; PNG &bull; WEBP &bull; GIF</p>
+        </div>
+        <input type="file" id="imageUpload" accept="image/*" />
+      </div>
+      <div id="errorMsg" style="display:none;margin-top:10px;padding:12px 18px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;color:#ef4444;font-size:14px;text-align:center;"></div>
+      <div class="options-box">
+        <h3>Analysis Options</h3>
+        <div class="options-grid">
+          <div class="option-item"><input type="checkbox" id="opt1" checked /><label for="opt1">Pattern Analysis</label></div>
+          <div class="option-item"><input type="checkbox" id="opt2" checked /><label for="opt2">Texture Check</label></div>
+          <div class="option-item"><input type="checkbox" id="opt3" checked /><label for="opt3">Artifact Detection</label></div>
+          <div class="option-item"><input type="checkbox" id="opt4" /><label for="opt4">Metadata Scan</label></div>
+        </div>
+      </div>
+      <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()">🔍 Analyze Image Now</button>
+    </section>
+
+    <section class="how-it-works">
+      <h2>How It Works</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-number">01</div><div class="step-icon">🖼️</div><h4>Upload Image</h4><p>Select any image you want to verify for authenticity.</p></div>
+        <div class="step-card"><div class="step-number">02</div><div class="step-icon">🤖</div><h4>AI Analysis</h4><p>Pre-trained CNN model scans patterns, textures and artifacts.</p></div>
+        <div class="step-card"><div class="step-number">03</div><div class="step-icon">✅</div><h4>Get Result</h4><p>Receive a confidence score — real or AI-generated.</p></div>
+        <div class="step-card"><div class="step-number">04</div><div class="step-icon">📊</div><h4>View History</h4><p>All your past analyses saved for easy reference.</p></div>
+      </div>
+    </section>
+
+    <section class="features-section">
+      <h2>About This Project</h2>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">🤖</div><h4>Pre-trained Model</h4><p>Uses CNN-based model trained on real vs AI-generated datasets.</p></div>
+        <div class="feature-card"><div class="feature-icon">🔍</div><h4>Pattern Detection</h4><p>Detects GAN artifacts, unnatural textures and pixel-level inconsistencies.</p></div>
+        <div class="feature-card"><div class="feature-icon">🔒</div><h4>Privacy Safe</h4><p>Images processed and deleted after analysis. Nothing stored permanently.</p></div>
+        <div class="feature-card"><div class="feature-icon">📊</div><h4>Confidence Score</h4><p>Percentage score with Low, Medium or High confidence level for each result.</p></div>
+        <div class="feature-card"><div class="feature-icon">⚡</div><h4>Fast Processing</h4><p>Results generated in seconds using optimized inference on the backend API.</p></div>
+        <div class="feature-card"><div class="feature-icon">🎓</div><h4>Final Year Project</h4><p>Built as a college project to detect AI-generated images using machine learning.</p></div>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="stat-box"><div class="stat-number">CNN</div><div class="stat-label">Model Type</div></div>
+      <div class="stat-box"><div class="stat-number">3</div><div class="stat-label">Analysis Checks</div></div>
+      <div class="stat-box"><div class="stat-number">~3s</div><div class="stat-label">Avg Result Time</div></div>
+      <div class="stat-box"><div class="stat-number">Free</div><div class="stat-label">No Cost to Use</div></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">👁️ DeepFake Detector</div>
+      <p class="footer-desc">AI-powered image authenticity detection.</p>
+      <p class="footer-copy">&copy; 2026 DeepFake Detection System. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../js/hamburger.js"></script>
+  <script src="../js/api.js"></script>
+  <script>
+    const ANALYZE_URL = "/api/analyze";
+    let selectedFile = null;
+
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#e94560'; });
+    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.style.borderColor = ''; if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+    dropZone.addEventListener('click', e => { if (e.target.tagName === 'BUTTON' || e.target.tagName === 'LABEL') return; if (selectedFile) return; document.getElementById('imageUpload').click(); });
+
+    function handleFile(file) {
+      if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)) { showError('Invalid file type.'); return; }
+      if (file.size > 10*1024*1024) { showError('File too large. Max 10MB.'); return; }
+      hideError();
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('imagePreview').src = e.target.result;
+        const size = file.size > 1024*1024 ? (file.size/(1024*1024)).toFixed(2)+' MB' : (file.size/1024).toFixed(1)+' KB';
+        document.getElementById('previewInfo').textContent = `${file.name}  |  ${size}  |  ${file.type.split('/')[1].toUpperCase()}`;
+        document.getElementById('previewContainer').style.display = 'flex';
+        document.getElementById('uploadUI').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeImage() {
+      selectedFile = null;
+      document.getElementById('imageUpload').value = '';
+      document.getElementById('imagePreview').src = '';
+      document.getElementById('previewContainer').style.display = 'none';
+      document.getElementById('uploadUI').style.display = 'block';
+      hideError();
+    }
+
+    function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
+    function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
+
+    async function analyzeImage() {
+      if (!selectedFile) { showError('Please select an image first.'); return; }
+
+      if (window.checkScanAllowed) {
+        const check = window.checkScanAllowed();
+        if (!check.allowed) { showError(check.reason); return; }
+      }
+
+      const btn = document.getElementById('analyzeBtn');
+      btn.textContent = 'Analyzing...';
+      btn.style.background = '#374151';
+      btn.style.pointerEvents = 'none';
+      hideError();
+
+      try {
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+        const response = await fetch(ANALYZE_URL, { method: 'POST', body: formData });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.error || 'API error.');
+
+        if (window.recordScan) {
+          window.recordScan({
+            verdict: data.verdict,
+            ai_score: data.ai_score,
+            real_score: data.real_score,
+            confidence: data.confidence,
+            processing_time: data.processing_time,
+            status: 'completed'
+          });
+        }
+
+        localStorage.setItem('deepfake_result', JSON.stringify(data));
+        const reader = new FileReader();
+        reader.onload = e => {
+          localStorage.setItem('deepfake_image', e.target.result);
+          window.location.href = 'result.html';
+        };
+        reader.readAsDataURL(selectedFile);
+
+      } catch (err) {
+        btn.textContent = 'Analyze Image Now';
+        btn.style.background = '';
+        btn.style.pointerEvents = '';
+        showError(err.message);
+      }
+    }
+  </script>
+
+</body>
+</html>
