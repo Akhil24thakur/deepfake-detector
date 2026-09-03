@@ -268,8 +268,11 @@
       try {
         const formData = new FormData();
         formData.append('image', selectedFile);
+        console.log('Sending analyze request...');
         const response = await fetch(ANALYZE_URL, { method: 'POST', body: formData });
+        console.log('Response status:', response.status);
         const data = await response.json();
+        console.log('Response data:', data);
         if (!response.ok || !data.success) throw new Error(data.error || 'API error.');
 
         if (window.recordScan) {
@@ -292,6 +295,7 @@
         reader.readAsDataURL(selectedFile);
 
       } catch (err) {
+        console.error('Analyze error:', err);
         btn.textContent = 'Analyze Image Now';
         btn.style.background = '';
         btn.style.pointerEvents = '';
