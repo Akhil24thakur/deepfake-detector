@@ -56,7 +56,12 @@ function loadAndRender() {
     breakdown: { pixel_consistency: 74.3, edge_sharpness: 91.7, texture_analysis: 85.6, gan_artifacts: 93.5, color_distribution: 68.2, noise_pattern: 79.5 }
   };
 
-  if (imgSrc) document.getElementById("previewImg").src = imgSrc;
+  if (imgSrc) {
+    document.getElementById("previewImg").src = imgSrc;
+  } else {
+    document.getElementById("previewImg").alt = "Image preview not available";
+    document.getElementById("previewImg").style.opacity = "0.3";
+  }
 
   populateResults(data);
   animateScoreRing(data.is_ai ? data.ai_score : data.real_score);

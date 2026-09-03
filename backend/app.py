@@ -16,6 +16,7 @@ from routes.auth import auth
 from routes.scans import scans
 
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend")
+PAGES_DIR = os.path.join(FRONTEND_DIR, "pages")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 app.config["SECRET_KEY"] = SECRET_KEY
@@ -38,6 +39,9 @@ def health():
         "status": "running",
         "message": "DeepFake Detection API is live",
         "version": "1.0.0",
+        "frontend_dir": FRONTEND_DIR,
+        "pages_dir": PAGES_DIR,
+        "result_exists": os.path.exists(os.path.join(PAGES_DIR, "result.html")),
     })
 
 
