@@ -296,7 +296,7 @@
             const img = new Image();
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              const maxDim = 400;
+              const maxDim = 800;
               let w = img.width, h = img.height;
               if (w > maxDim || h > maxDim) {
                 if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
@@ -306,7 +306,7 @@
               canvas.height = h;
               canvas.getContext('2d').drawImage(img, 0, 0, w, h);
               try {
-                localStorage.setItem('deepfake_image', canvas.toDataURL('image/jpeg', 0.6));
+                localStorage.setItem('deepfake_image', canvas.toDataURL('image/jpeg', 0.8));
               } catch (e2) {
                 console.warn('Could not store image, proceeding without preview');
               }
