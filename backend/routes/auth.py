@@ -1,8 +1,6 @@
 from flask import Blueprint, request, jsonify
 
 from models.database import query
-from models.detector import predict
-from utils.image_utils import validate_and_load, get_image_info
 
 auth = Blueprint("auth", __name__)
 
@@ -11,13 +9,11 @@ class PasswordManager:
     @staticmethod
     def hash(password, salt):
         import hashlib
-
         return hashlib.sha256((password + salt).encode()).hexdigest()
 
     @staticmethod
     def generate_salt():
         import secrets
-
         return secrets.token_hex(16)
 
     @staticmethod
@@ -29,13 +25,11 @@ class Validator:
     @staticmethod
     def email(email):
         import re
-
         return re.match(r"^[^@]+@[^@]+\.[^@]+$", email) is not None
 
     @staticmethod
     def mobile(mobile):
         import re
-
         digits = re.sub(r"\D", "", mobile)
         return 10 <= len(digits) <= 13
 
@@ -106,35 +100,14 @@ class AuthService:
         if not email or not Validator.email(email):
             return {"success": False, "error": "Valid email is required"}, 400
         if not mobile or not Validator.mobile(mobile):
-            return (
-                {"success": False, "error": "Valid mobile number is required"},
-                400,
-            )
+            return {"success": False, "error": "Valid mobile number is required"}, 400
         if not Validator.password(password):
-            return (
-                {
-                    "success": False,
-                    "error": "Password must be at least 6 characters",
-                },
-                400,
-            )
+            return {"success": False, "error": "Password must be at least 6 characters"}, 400
 
         if UserRepository.find_by_email(email):
-            return (
-                {
-                    "success": False,
-                    "error": "Email already registered. Please sign in.",
-                },
-                400,
-            )
+            return {"success": False, "error": "Email already registered. Please sign in."}, 400
         if UserRepository.find_by_mobile(mobile):
-            return (
-                {
-                    "success": False,
-                    "error": "Mobile already registered. Please sign in.",
-                },
-                400,
-            )
+            return {"success": False, "error": "Mobile already registered. Please sign in."}, 400
 
         salt = PasswordManager.generate_salt()
         password_hash = PasswordManager.hash(password, salt)
@@ -144,10 +117,7 @@ class AuthService:
         )
 
         if not new_id:
-            return (
-                {"success": False, "error": "Registration failed. Try again."},
-                500,
-            )
+            return {"success": False, "error": "Registration failed. Try again."}, 500
 
         return {
             "success": True,
@@ -176,10 +146,7 @@ class AuthService:
         user = UserRepository.find_by_identifier(identifier)
 
         if not user:
-            return (
-                {"success": False, "error": "Account not found. Please sign up."},
-                404,
-            )
+            return {"success": False, "error": "Account not found. Please sign up."}, 404
 
         if not PasswordManager.verify(password, user["salt"], user["password_hash"]):
             return {"success": False, "error": "Incorrect password"}, 401
@@ -219,5 +186,4 @@ def get_user(user_id):
     user = UserRepository.find_by_id(user_id)
     if not user:
         return jsonify({"success": False, "error": "User not found"}), 404
-
     return jsonify({"success": True, "user": user}), 200

@@ -17,27 +17,23 @@ def save_scan():
     ai_score = data.get("ai_score", 0)
     real_score = data.get("real_score", 0)
     confidence = data.get("confidence", "MEDIUM")
-    model_used = data.get("model_used", "CNN + HuggingFace")
+    model_used = data.get("model_used", "CNN v2.1")
     processing_time = data.get("processing_time", "")
     status = data.get("status", "completed")
     error_message = data.get("error_message", "")
 
     if not user_id or not verdict:
-        return (
-            {"success": False, "error": "user_id and verdict required"},
-            400,
-        )
+        return {"success": False, "error": "user_id and verdict required"}, 400
 
-    user = query(
-        "SELECT * FROM users WHERE id = %s", (user_id,), fetch="one"
-    )
+    user = query("SELECT * FROM users WHERE id = %s", (user_id,), fetch="one")
     if not user:
         return jsonify({"success": False, "error": "User not found"}), 404
 
     today = str(date.today())
     limit = 4 if user["plan"] == "free" else 20
 
-    if str(user["last_scan_date"]) != today:
+    last_date = str(user["last_scan_date"]) if user["last_scan_date"] else ""
+    if last_date != today:
         query(
             "UPDATE users SET scans_today = 0, last_scan_date = %s WHERE id = %s",
             (today, user_id),
@@ -133,9 +129,8 @@ def get_stats(user_id):
     )
 
     today = str(date.today())
-    scans_today = (
-        user["scans_today"] if user and str(user["last_scan_date"]) == today else 0
-    )
+    last_date = str(user["last_scan_date"]) if user and user["last_scan_date"] else ""
+    scans_today = user["scans_today"] if user and last_date == today else 0
     limit = 4 if (user and user["plan"] == "free") else 20
 
     return jsonify({

@@ -1,23 +1,30 @@
 import os
+import sys
 import time
 
 from flask import Flask, request, jsonify, send_from_directory, abort
 from flask_cors import CORS
 from PIL import Image
 
-from config import FLASK_DEBUG
+sys.path.insert(0, os.path.dirname(__file__))
+
+from config import FLASK_DEBUG, SECRET_KEY
+from models.database import init_db
 from models.detector import predict
 from utils.image_utils import validate_and_load, get_image_info
 from routes.auth import auth
 from routes.scans import scans
 
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
+app.config["SECRET_KEY"] = SECRET_KEY
 CORS(app, origins="*")
 
 app.register_blueprint(auth)
 app.register_blueprint(scans)
+
+init_db()
 
 
 @app.route("/")
@@ -75,6 +82,16 @@ def analyze():
             "noise_pattern": round(min(prediction["ai_score"] * 0.91, 100), 1),
         },
     }), 200
+
+
+@app.route("/css/<path:filename>")
+def serve_css(filename):
+    return send_from_directory(os.path.join(FRONTEND_DIR, "css"), filename)
+
+
+@app.route("/js/<path:filename>")
+def serve_js(filename):
+    return send_from_directory(os.path.join(FRONTEND_DIR, "js"), filename)
 
 
 @app.route("/<path:filename>")

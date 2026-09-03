@@ -1,16 +1,6 @@
-// frontend/api.js
-// Yeh file sabhi pages mein include karo: <script src="api.js"></script>
-// Sab fetch calls yahan se hoti hain
-
-const API_URL = "https://deepfake-detection-system-jnfo.onrender.com" // Flask server URL
-const API = API_URL
-
-// ════════════════════════════════
-// AUTH FUNCTIONS
-// ════════════════════════════════
+const API = window.location.origin;
 
 async function apiSignup(formData) {
-  // formData = { name, username, email, mobile, password, dob, gender, city }
   const res = await fetch(`${API}/api/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,7 +10,6 @@ async function apiSignup(formData) {
 }
 
 async function apiLogin(identifier, password) {
-  // identifier = email ya mobile number
   const res = await fetch(`${API}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -29,12 +18,7 @@ async function apiLogin(identifier, password) {
   return await res.json();
 }
 
-// ════════════════════════════════
-// SCAN FUNCTIONS
-// ════════════════════════════════
-
 async function apiSaveScan(scanData) {
-  // scanData = { user_id, verdict, ai_score, real_score, confidence, processing_time, status }
   const res = await fetch(`${API}/api/scan/save`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -52,10 +36,6 @@ async function apiGetStats(userId) {
   const res = await fetch(`${API}/api/scan/stats/${userId}`);
   return await res.json();
 }
-
-// ════════════════════════════════
-// LOCAL SESSION HELPERS
-// ════════════════════════════════
 
 function saveSession(user) {
   localStorage.setItem('df_user', JSON.stringify(user));

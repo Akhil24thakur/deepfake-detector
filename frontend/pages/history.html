@@ -6,9 +6,9 @@
   <title>Scan History — DeepFake Detector</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Exo+2:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/main.css"/>
-  <link rel="stylesheet" href="../css/hamburger.css"/>
-  <link rel="stylesheet" href="../css/mobile.css"/>
+  <link rel="stylesheet" href="/css/main.css"/>
+  <link rel="stylesheet" href="/css/hamburger.css"/>
+  <link rel="stylesheet" href="/css/mobile.css"/>
   <style>
     .history-page { min-height: 100vh; background: #060a14; padding-top: 72px; position: relative; overflow-x: hidden; }
     .history-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 50% 40% at 80% 20%, rgba(233,69,96,0.08) 0%, transparent 65%), radial-gradient(ellipse 40% 40% at 10% 80%, rgba(0,212,255,0.05) 0%, transparent 60%); }
@@ -208,9 +208,9 @@
     <div class="toast-text" id="toastMsg">You have <strong>1 scan</strong> remaining today.</div>
   </div>
 
-  <script src="../js/hamburger.js"></script>
+  <script src="/js/hamburger.js"></script>
   <script>
-  const API         = 'http://127.0.0.1:5000';
+  const API         = window.location.origin;
   const FREE_LIMIT  = 4;
   const STORAGE_KEY = 'df_guest_scans';
 
