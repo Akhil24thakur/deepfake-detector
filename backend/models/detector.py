@@ -1,11 +1,14 @@
 from PIL import Image
+import io
 
 
 def predict(image: Image.Image) -> dict:
     image = image.convert("RGB")
     w, h = image.size
+    if w > 512 or h > 512:
+        image.thumbnail((512, 512), Image.LANCZOS)
     pixels = list(image.getdata())
-    sample = pixels[::max(1, len(pixels) // 1000)]
+    sample = pixels[::max(1, len(pixels) // 500)]
     r_avg = sum(p[0] for p in sample) / len(sample)
     g_avg = sum(p[1] for p in sample) / len(sample)
     b_avg = sum(p[2] for p in sample) / len(sample)
