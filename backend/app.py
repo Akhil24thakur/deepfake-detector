@@ -35,12 +35,20 @@ def index():
 
 @app.route("/api/health", methods=["GET"])
 def health():
-    from models.detector import HIVE_API_KEY
+    from models.detector import HIVE_API_KEY, NVIDIA_API_KEY
+    active = []
+    if HIVE_API_KEY:
+        active.append("Hive")
+    if NVIDIA_API_KEY:
+        active.append("NVIDIA")
+    if not active:
+        active.append("Heuristic")
     return jsonify({
         "status": "running",
         "message": "DeepFake Detection API is live",
         "version": "1.0.0",
-        "detection_mode": "Hive API" if HIVE_API_KEY else "Heuristic",
+        "detection_mode": " + ".join(active),
+        "models_active": len(active),
     })
 
 
@@ -89,6 +97,10 @@ def analyze():
         resp["source"] = prediction["source"]
     if prediction.get("generators"):
         resp["generators"] = prediction["generators"]
+    if prediction.get("models_used"):
+        resp["models_used"] = prediction["models_used"]
+    if prediction.get("models_agree") is not None:
+        resp["models_agree"] = prediction["models_agree"]
     return jsonify(resp), 200
 
 

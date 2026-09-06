@@ -119,6 +119,17 @@ function populateResults(data) {
     });
   }
 
+  if (data.models_used && data.models_used > 1) {
+    document.getElementById("consensusInfo").style.display = "flex";
+    if (data.models_agree) {
+      document.getElementById("consensusIcon").textContent = "🤝";
+      document.getElementById("consensusText").textContent = `${data.models_used} models agree — higher confidence`;
+    } else {
+      document.getElementById("consensusIcon").textContent = "⚠️";
+      document.getElementById("consensusText").textContent = `${data.models_used} models disagree — lower confidence`;
+    }
+  }
+
   if (!isAI) document.getElementById("ringFill").classList.add("real-ring");
 
   if (data.image_info) {

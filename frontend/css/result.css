@@ -657,6 +657,19 @@
   text-transform: capitalize;
 }
 
+.consensus-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  background: rgba(99,102,241,0.06);
+  border: 1px solid rgba(99,102,241,0.12);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--res-text-muted);
+}
+
 /* ---------- BREAKDOWN CARD ---------- */
 .breakdown-list {
   display: flex;

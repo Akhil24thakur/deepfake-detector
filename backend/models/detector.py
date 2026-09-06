@@ -1,6 +1,7 @@
 import os
 import uuid
 import base64
+import re
 import requests
 from PIL import Image
 import io
@@ -9,20 +10,97 @@ import numpy as np
 
 HIVE_API_URL = "https://api.hivemoderation.com/api/v2/task/sync"
 HIVE_API_KEY = os.environ.get("HIVE_API_KEY", "")
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 TEMP_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "temp_images")
 os.makedirs(TEMP_DIR, exist_ok=True)
 
-HEAVY_ENABLED = False
-
 
 def predict(image: Image.Image) -> dict:
+    results = []
+    errors = []
+
+    # Try Hive first
     if HIVE_API_KEY:
         try:
-            return _predict_hive(image)
+            hive_result = _predict_hive(image)
+            hive_result["model"] = "Hive AI Detection"
+            results.append(hive_result)
         except Exception as e:
-            print(f"Hive API failed, falling back to heuristic: {e}")
+            errors.append(f"Hive: {e}")
+            print(f"Hive API failed: {e}")
 
-    return _predict_heuristic(image)
+    # Try NVIDIA second
+    if NVIDIA_API_KEY:
+        try:
+            nvidia_result = _predict_nvidia(image)
+            nvidia_result["model"] = "NVIDIA Vision (kimi-k3)"
+            results.append(nvidia_result)
+        except Exception as e:
+            errors.append(f"NVIDIA: {e}")
+            print(f"NVIDIA API failed: {e}")
+
+    # If we have results from multiple models, combine them
+    if len(results) >= 2:
+        return _combine_results(results)
+    elif len(results) == 1:
+        return results[0]
+    else:
+        # Fallback to heuristic
+        print(f"All APIs failed, using heuristic. Errors: {errors}")
+        return _predict_heuristic(image)
+
+
+def _combine_results(results: list) -> dict:
+    """Combine results from multiple models for higher confidence."""
+    avg_ai = sum(r["ai_score"] for r in results) / len(results)
+    avg_real = sum(r["real_score"] for r in results) / len(results)
+
+    # Check if models agree
+    all_agree = all(r["is_ai"] for r in results) or all(not r["is_ai"] for r in results)
+
+    if all_agree:
+        confidence_boost = 10
+    else:
+        confidence_boost = -10
+
+    ai_score = round(min(100, max(0, avg_ai + confidence_boost)), 1)
+    real_score = round(100 - ai_score, 1)
+    is_ai = ai_score > 50
+
+    if max(ai_score, real_score) >= 85:
+        confidence = "HIGH"
+    elif max(ai_score, real_score) >= 65:
+        confidence = "MEDIUM"
+    else:
+        confidence = "LOW"
+
+    # Merge sources and generators
+    all_sources = []
+    all_generators = {}
+    for r in results:
+        if r.get("source"):
+            all_sources.append(r["source"])
+        if r.get("generators"):
+            for gen, score in r["generators"].items():
+                all_generators[gen] = max(all_generators.get(gen, 0), score)
+
+    result = {
+        "verdict": "AI Generated" if is_ai else "Real Image",
+        "ai_score": ai_score,
+        "real_score": real_score,
+        "confidence": confidence,
+        "is_ai": is_ai,
+        "model": "Ensemble (" + " + ".join(r["model"] for r in results) + ")",
+        "models_used": len(results),
+        "models_agree": all_agree,
+    }
+
+    if all_sources:
+        result["source"] = all_sources[0]
+    if all_generators:
+        result["generators"] = all_generators
+
+    return result
 
 
 def _predict_hive(image: Image.Image) -> dict:
@@ -108,7 +186,6 @@ def _predict_hive(image: Image.Image) -> dict:
             "real_score": real_score,
             "confidence": confidence,
             "is_ai": is_ai,
-            "model": "Hive AI Detection",
         }
 
         if source and source != "unknown":
@@ -120,6 +197,92 @@ def _predict_hive(image: Image.Image) -> dict:
     finally:
         if os.path.exists(filepath):
             os.remove(filepath)
+
+
+def _predict_nvidia(image: Image.Image) -> dict:
+    """Use NVIDIA Vision model (kimi-k3) to detect AI-generated images."""
+    try:
+        from langchain_nvidia_ai_endpoints import ChatNVIDIA
+    except ImportError:
+        raise Exception("langchain_nvidia_ai_endpoints not installed")
+
+    client = ChatNVIDIA(
+        model="moonshotai/kimi-k3",
+        api_key=NVIDIA_API_KEY,
+        temperature=0.1,
+        max_completion_tokens=1024,
+    )
+
+    # Convert image to base64
+    image = image.convert("RGB")
+    if image.size[0] > 512 or image.size[1] > 512:
+        image.thumbnail((512, 512), Image.LANCZOS)
+
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG", quality=85)
+    img_b64 = base64.b64encode(buf.getvalue()).decode()
+
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": """Analyze this image and determine if it is AI-generated or a real photograph.
+
+Respond with ONLY a JSON object in this exact format:
+{"is_ai": true/false, "confidence": 0.0-1.0, "reason": "brief explanation"}
+
+Examples:
+{"is_ai": true, "confidence": 0.95, "reason": "Perfect symmetry, unnatural skin texture, no noise patterns"}
+{"is_ai": false, "confidence": 0.88, "reason": "Natural noise, realistic lighting, visible compression artifacts"}
+
+Do NOT include any text before or after the JSON.""",
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{img_b64}",
+                    },
+                },
+            ],
+        }
+    ]
+
+    response = client.invoke(messages)
+    text = response.content.strip()
+
+    # Try to extract JSON from response
+    json_match = re.search(r'\{[^}]+\}', text)
+    if not json_match:
+        raise Exception(f"No JSON in NVIDIA response: {text[:200]}")
+
+    data = json.loads(json_match.group())
+
+    is_ai = data.get("is_ai", False)
+    nvidia_conf = data.get("confidence", 0.5) * 100
+
+    if is_ai:
+        ai_score = round(nvidia_conf, 1)
+        real_score = round(100 - nvidia_conf, 1)
+    else:
+        real_score = round(nvidia_conf, 1)
+        ai_score = round(100 - nvidia_conf, 1)
+
+    if max(ai_score, real_score) >= 80:
+        confidence = "HIGH"
+    elif max(ai_score, real_score) >= 60:
+        confidence = "MEDIUM"
+    else:
+        confidence = "LOW"
+
+    return {
+        "verdict": "AI Generated" if is_ai else "Real Image",
+        "ai_score": ai_score,
+        "real_score": real_score,
+        "confidence": confidence,
+        "is_ai": is_ai,
+    }
 
 
 def _predict_heuristic(image: Image.Image) -> dict:
