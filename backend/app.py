@@ -35,10 +35,12 @@ def index():
 
 @app.route("/api/health", methods=["GET"])
 def health():
+    from models.detector import HIVE_API_KEY
     return jsonify({
         "status": "running",
         "message": "DeepFake Detection API is live",
         "version": "1.0.0",
+        "detection_mode": "Hive API" if HIVE_API_KEY else "Heuristic",
     })
 
 
@@ -64,7 +66,7 @@ def analyze():
             500,
         )
     processing_time = round(time.time() - start_time, 2)
-    return jsonify({
+    resp = {
         "success": True,
         "verdict": prediction["verdict"],
         "is_ai": prediction["is_ai"],
@@ -73,7 +75,7 @@ def analyze():
         "confidence": prediction["confidence"],
         "processing_time": f"{processing_time}s",
         "image_info": image_info,
-        "model": "CNN v2.1",
+        "model": prediction.get("model", "AI Detection"),
         "breakdown": {
             "pixel_consistency": round(min(prediction["ai_score"] * 0.85, 100), 1),
             "edge_sharpness": round(min(prediction["ai_score"] * 1.05, 100), 1),
@@ -82,7 +84,12 @@ def analyze():
             "color_distribution": round(min(prediction["ai_score"] * 0.78, 100), 1),
             "noise_pattern": round(min(prediction["ai_score"] * 0.91, 100), 1),
         },
-    }), 200
+    }
+    if prediction.get("source"):
+        resp["source"] = prediction["source"]
+    if prediction.get("generators"):
+        resp["generators"] = prediction["generators"]
+    return jsonify(resp), 200
 
 
 @app.route("/css/<path:filename>")

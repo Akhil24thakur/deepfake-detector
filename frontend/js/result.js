@@ -74,6 +74,7 @@ function populateResults(data) {
 
   document.getElementById("verdictText").textContent   = data.verdict.toUpperCase();
   document.getElementById("verdictIcon").textContent   = isAI ? "🤖" : "✅";
+  document.getElementById("verdictSub").textContent    = (data.model || "AI Detection") + " Verdict";
   document.getElementById("verdictDesc").textContent   = isAI
     ? "This image shows strong indicators of AI generation. Multiple anomalies detected across texture and pixel layers."
     : "This image appears authentic. No significant AI-generation patterns were detected by the CNN model.";
@@ -94,6 +95,29 @@ function populateResults(data) {
   document.getElementById("aiPct").textContent      = data.ai_score + "%";
   document.getElementById("realPct").textContent    = data.real_score + "%";
   document.getElementById("procTime").textContent   = data.processing_time;
+
+  if (data.model) {
+    document.getElementById("modelName").textContent = data.model;
+    document.getElementById("reportModel").textContent = data.model;
+  }
+
+  if (data.source) {
+    document.getElementById("sourceInfo").style.display = "block";
+    document.getElementById("aiSource").textContent = data.source;
+  }
+
+  if (data.generators && Object.keys(data.generators).length > 0) {
+    document.getElementById("generatorsInfo").style.display = "block";
+    const genList = document.getElementById("genList");
+    genList.innerHTML = "";
+    const sorted = Object.entries(data.generators).sort((a, b) => b[1] - a[1]);
+    sorted.slice(0, 5).forEach(([name, score]) => {
+      const el = document.createElement("span");
+      el.className = "gen-tag";
+      el.textContent = `${name.replace(/_/g, " ")} (${score}%)`;
+      genList.appendChild(el);
+    });
+  }
 
   if (!isAI) document.getElementById("ringFill").classList.add("real-ring");
 

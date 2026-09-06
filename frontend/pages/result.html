@@ -181,7 +181,7 @@
               <div class="verdict-pulse"></div>
             </div>
             <div class="verdict-text-wrap">
-              <p class="verdict-sub">CNN Model Verdict</p>
+              <p class="verdict-sub" id="verdictSub">AI Detection Model Verdict</p>
               <h2 class="verdict-main" id="verdictText">AI GENERATED</h2>
               <p class="verdict-desc" id="verdictDesc">This image shows strong indicators of AI generation.</p>
             </div>
@@ -221,7 +221,14 @@
           </div>
           <div class="processing-info">
             <span>⚡ Processed in <strong id="procTime">2.3s</strong></span>
-            <span>🧠 Model: <strong>CNN v2.1</strong></span>
+            <span>🧠 Model: <strong id="modelName">AI Detection</strong></span>
+          </div>
+          <div class="source-info" id="sourceInfo" style="display:none;">
+            <span>🎯 Source: <strong id="aiSource">Unknown</strong></span>
+          </div>
+          <div class="generators-info" id="generatorsInfo" style="display:none;">
+            <span class="gen-label">Detected generators:</span>
+            <div class="gen-list" id="genList"></div>
           </div>
         </div>
 
@@ -274,7 +281,7 @@
       <div class="report-footer-strip">
         <span>🕐 Analyzed: <span id="analysisTime">30 Mar 2026, 14:35</span></span>
         <span>🆔 Report ID: <span id="reportId">DF-2026-0330-8472</span></span>
-        <span>🤖 Model: CNN v2.1</span>
+        <span>🤖 Model: <span id="reportModel">AI Detection</span></span>
         <span>✅ Status: Complete</span>
       </div>
     </div>

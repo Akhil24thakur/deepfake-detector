@@ -619,6 +619,44 @@
   flex-wrap: wrap;
 }
 
+.source-info {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--res-text-muted);
+  padding-top: 8px;
+  flex-wrap: wrap;
+}
+
+.generators-info {
+  padding-top: 8px;
+}
+
+.gen-label {
+  font-size: 11px;
+  color: var(--res-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gen-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.gen-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--accent-primary, #6366f1);
+  text-transform: capitalize;
+}
+
 /* ---------- BREAKDOWN CARD ---------- */
 .breakdown-list {
   display: flex;
